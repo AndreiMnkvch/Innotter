@@ -1,31 +1,30 @@
-from typing import Tuple
-
 from rest_framework.request import Request
 
+from core.models import Page
 from users.models import User
 
 
-ADMIN_CAN_CHANGE_FIELDS = ('unblock_date', 'is_blocked_forever')
-MODERATOR_CAN_CHANGE_FIELDS = ('unblock_date',)
-USER_CAN_CHANGE_FIELDS = ('name', 'description', 'tags', 'is_private')
+class PagePermissionService:
+    ADMIN_CAN_CHANGE_FIELDS = {'unblock_date', 'is_blocked_forever'}
+    MODERATOR_CAN_CHANGE_FIELDS = {'unblock_date'}
+    USER_CAN_CHANGE_FIELDS = {'name', 'description', 'tags', 'is_private'}
 
+    @staticmethod
+    def check_fields_are_allowed(request: Request, allowed_fields: set[str]) -> bool:
+        return set(request.data).issubset(allowed_fields)
 
-def check_fields_are_allowed(request: Request, allowed_fields: Tuple[str]) -> bool:
-    for updated_field in request.data.keys():
-        print(updated_field in request.data.keys())
-        print(type(request.data))
-        if updated_field not in allowed_fields:
-            return False
-    return True
+    @staticmethod
+    def user_is_page_owner(request: Request, obj: Page) -> bool:
+        return request.user == obj.owner
 
-def user_is_page_owner(request, obj):
-    return request.user == obj.owner
-
-
-def check_page_patch_permission(request, obj):
-    if request.user.role == User.Roles.ADMIN:
-        return check_fields_are_allowed(request, ADMIN_CAN_CHANGE_FIELDS)
-    elif request.user.role == User.Roles.MODERATOR:
-        return check_fields_are_allowed(request, MODERATOR_CAN_CHANGE_FIELDS)
-    elif request.user.role == User.Roles.USER:
-        return check_fields_are_allowed(request, USER_CAN_CHANGE_FIELDS) and user_is_page_owner(request, obj)
+    @staticmethod
+    def check_page_patch_permission(request: Request, obj: Page) -> bool:
+        if request.user.role == User.Roles.ADMIN:
+            return PagePermissionService.check_fields_are_allowed(request, PagePermissionService.ADMIN_CAN_CHANGE_FIELDS)
+        elif request.user.role == User.Roles.MODERATOR:
+            return PagePermissionService.check_fields_are_allowed(request, PagePermissionService.MODERATOR_CAN_CHANGE_FIELDS)
+        elif request.user.role == User.Roles.USER:
+            return all((
+                PagePermissionService.check_fields_are_allowed(request, PagePermissionService.USER_CAN_CHANGE_FIELDS),
+                PagePermissionService.user_is_page_owner(request, obj)
+            ))

@@ -1,4 +1,4 @@
-from .models import Post, Page, Tag
+from core.models import Post, Page, Tag
 
 from rest_framework import serializers
 
