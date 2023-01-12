@@ -15,20 +15,23 @@ DEBUG = os.getenv('DEBUG')
 ALLOWED_HOSTS = ['*']
 
 
-INSTALLED_APPS = [
+CORE_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #Local
+]
+LOCAL_APPS = [
     'core.apps.CoreConfig',
     'users.apps.UsersConfig',
-    #3rd party packages
+]
+THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
 ]
+INSTALLED_APPS = CORE_APPS + LOCAL_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

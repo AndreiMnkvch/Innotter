@@ -22,8 +22,9 @@ class PageViewSetServices:
         for tag in request.data["tags"]:
             try:
                 tag_to_delete = page.tags.get(name__exact=tag["name"])
-            except Tag.DoesNotExist:
                 page.tags.remove(tag_to_delete)
+            except Tag.DoesNotExist:
+                pass
 
     @staticmethod
     def subscribe_service(page: Page, request: Request) -> None:
