@@ -1,3 +1,4 @@
+from django.core.validators import validate_image_file_extension
 from django.db import models
 import uuid
 
@@ -16,7 +17,11 @@ class Page(models.Model):
     tags = models.ManyToManyField('core.Tag', related_name='pages', blank=True)
     owner = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='pages')
     followers = models.ManyToManyField('users.User', related_name='follows', blank=True)
-    image = models.URLField(null=True, blank=True)
+    image = models.ImageField(null=True,
+                              blank=True,
+                              upload_to='page_images',
+                              validators=[validate_image_file_extension]
+                              )
     is_private = models.BooleanField(default=False)
     follow_requests = models.ManyToManyField('users.User', blank=True, related_name='requests')
     is_blocked_forever = models.BooleanField(default=False)

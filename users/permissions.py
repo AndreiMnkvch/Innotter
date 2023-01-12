@@ -10,10 +10,13 @@ class UserPermission(BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         if request.method == 'PATCH':
-            return request.user.role == User.Roles.ADMIN
+            return request.user.role == User.Roles.ADMIN or request.user == obj
         if request.method == 'DELETE':
             #there is an opportunity to delete user only from django admin site
             return False
+
+    def has_permission(self, request, view):
+        return True
 
 
 

@@ -9,7 +9,7 @@ class TagSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class PageSerializer(serializers.ModelSerializer):
+class PageBaseSerializer(serializers.ModelSerializer):
     owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = Page
@@ -17,6 +17,13 @@ class PageSerializer(serializers.ModelSerializer):
         read_only_fields = ('is_blocked_forever', 'unblock_date', 'uuid')
         depth = 1
 
+class PageAdminSerializer(PageBaseSerializer):
+    class Meta(PageBaseSerializer.Meta):
+        read_only_fields = ('name', 'description', 'tags', 'followers','image','is_private', 'uuid')
+
+class PageModeratorSerializer(PageBaseSerializer):
+    class Meta(PageBaseSerializer.Meta):
+        read_only_fields = ('name', 'is_blocked_forever', 'description', 'tags', 'followers','image','is_private', 'uuid')
 
 class PostSerializer(serializers.ModelSerializer):
     class Meta:

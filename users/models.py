@@ -1,3 +1,4 @@
+from django.core.validators import validate_image_file_extension
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -9,7 +10,11 @@ class User(AbstractUser):
         ADMIN = 'admin'
 
     email = models.EmailField(unique=True)
-    image_s3_path = models.CharField(max_length=200, null=True, blank=True)
+    image_s3_path = models.ImageField(null=True,
+                                      blank=True,
+                                      upload_to='user_images',
+                                      validators=[validate_image_file_extension]
+                                      )
     role = models.CharField(max_length=9, choices=Roles.choices, default=Roles.USER)
     is_blocked = models.BooleanField(default=False)
 
