@@ -1,6 +1,9 @@
 from config.celery import app
 from core.models import Post
-from core.services.post_viewset_services import get_post_page_followers_emails, send_new_post_notification_service
+from core.services.post_viewset_services import (
+    get_post_page_followers_emails,
+    send_new_post_notification_service
+)
 
 
 @app.task

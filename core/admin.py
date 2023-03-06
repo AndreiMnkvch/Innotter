@@ -3,7 +3,8 @@ from .models import Tag, Page, Post
 
 
 class PageAdmin(admin.ModelAdmin):
-    readonly_fields = ['name', 'description', 'tags', 'owner', 'followers', 'image', 'is_private']
+    readonly_fields = ['name', 'description', 'tags',
+                       'owner', 'followers', 'image', 'is_private']
 
 
 admin.site.register(Tag)

@@ -10,11 +10,8 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
         self.get_response = get_response
 
     def __call__(self, request):
-        print('request.headers', request.headers)
-        print('request.path', request.path)
         auth_header = request.headers.get('Authorization', None)
         if not auth_header:
-            print('No auth header so request.user:', request.user)
             response = self.get_response(request)
 
         else:
@@ -27,12 +24,11 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
             print('access token:', access_token)
 
             try:
-                payload = jwt.decode(access_token, settings.SECRET_KEY, algorithms="HS256")
-                user_id = payload["user_id"]
-                response = self.get_response(request)
+                jwt.decode(access_token, settings.SECRET_KEY, algorithms="HS256")
             except jwt.ExpiredSignatureError:
-                HttpResponse('Access token is expired!', status=401)
-            except (jwt.DecodeError, jwt.InvalidTokenError):
-                HttpResponse('Invalid access token! Please send valid token', status=401)
+                return HttpResponse('Access token is expired!', status=401)
+            except (jwt.exceptions.DecodeError, jwt.InvalidTokenError):
+                return HttpResponse('Invalid access token! Please send valid token', status=401)
+            response = self.get_response(request)
 
         return response

@@ -2,16 +2,14 @@ from django.contrib.auth import get_user_model
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import viewsets, exceptions
 from rest_framework import filters
-from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-
-from core.serializers import PostSerializer
 from .permissions import UserPermission
-from .serializers import UserBaseSerializer, UserAdminSerializer,UserModeratorSerializer
+from .serializers import UserBaseSerializer, UserAdminSerializer, UserModeratorSerializer
 from .models import User
 from .services.token_services import generate_access_token, generate_refresh_token
-from .services.user_viewset_services import block_user_pages_service, statistics_service
+from .services.user_viewset_services import block_user_pages_service
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -36,18 +34,10 @@ class UserViewSet(viewsets.ModelViewSet):
         except AttributeError:
             return UserBaseSerializer
 
-
     def partial_update(self, request, *args, **kwargs):
         user = self.get_object()
         block_user_pages_service(user, request)
         return super().partial_update(request, *args, **kwargs)
-
-    @action(detail=True)
-    def statistics(self, request, pk=None):
-        """This endpoint collects the total number of posts, subscribers, likes of the user"""
-        user = self.get_object()
-        statistics_service(user)
-        return Response(status=200)
 
 
 @api_view(['POST'])

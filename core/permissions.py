@@ -1,5 +1,4 @@
 from rest_framework import permissions
-
 from users.models import User
 from core.services.page_permission_services import PagePermissionService
 
@@ -13,13 +12,29 @@ class PagePermission(permissions.BasePermission):
             if obj.is_private:
                 return any((
                     obj.followers.filter(id=request.user.id).exists(),
-                    request.user.role in (User.Roles.ADMIN, User.Roles.MODERATOR),
+                    request.user.role in (
+                        User.Roles.ADMIN, User.Roles.MODERATOR),
                     PagePermissionService.user_is_page_owner(request, obj)
                 ))
             return True
 
         if request.method == 'PATCH':
             return PagePermissionService.check_page_patch_permission(request, obj)
+
+        if request.method == 'DELETE':
+            return PagePermissionService.user_is_page_owner(request, obj)
+
+    def has_permission(self, request, view):
+        if request.method == 'POST':
+            PagePermissionService.check_page_post_permission(request)
+        else:
+            return True
+
+
+class PageOwner(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        return PagePermissionService.user_is_page_owner(request, obj)
 
 
 class PostPermission(permissions.BasePermission):

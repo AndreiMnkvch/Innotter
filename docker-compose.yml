@@ -13,7 +13,6 @@ services:
       - ./:/app
     networks:
       - core_net
-      - generic
   db:
     image: postgres:latest
     restart: always
@@ -34,7 +33,6 @@ services:
       - "15672:15672"
     networks:
       - core_net
-      - generic
   celery:
     build: .
     restart: always
@@ -56,5 +54,3 @@ volumes:
 networks:
   core_net:
     name: core_net
-  generic:
-    name: generic
