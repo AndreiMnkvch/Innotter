@@ -8,8 +8,22 @@ django = "*"
 djangorestframework = "*"
 python-dotenv = {extras = ["cli"], version = "*"}
 psycopg2-binary = "*"
+djangorestframework-simplejwt = {extras = ["crypto"], version = "*"}
+uuid = "*"
+boto3 = "*"
+django-storages = "*"
+pillow = "*"
+rabbitmq = "*"
+celery = "*"
+drf-spectacular = "*"
+pika = "*"
+aio-pika = "*"
+asyncio = "*"
+pytest = "*"
+coverage = "*"
 
 [dev-packages]
+autopep8 = "*"
 
 [requires]
 python_version = "3.11"

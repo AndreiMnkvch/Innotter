@@ -9,6 +9,10 @@ services:
       - .env
     depends_on:
       - db
+    volumes:
+      - ./:/app
+    networks:
+      - core_net
   db:
     image: postgres:latest
     restart: always
@@ -17,5 +21,36 @@ services:
       - .env
     volumes:
       - db_data:/var/lib/postgresql/data
+    networks:
+      - core_net
+  rabbitmq:
+    restart: always
+    image: rabbitmq:3-management
+    env_file:
+      - .env
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - core_net
+  celery:
+    build: .
+    restart: always
+    command: celery -A config worker -l INFO -B
+    image: celery:latest
+    volumes:
+      - ./:/app
+    env_file:
+      - .env
+    ports:
+      - "5555:5555"
+    depends_on:
+      - rabbitmq
+      - djangoapp
+    networks:
+      - core_net
 volumes:
   db_data:
+networks:
+  core_net:
+    name: core_net
